@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+
 import { getProjects } from '../services/api';
 import UploadForm from '../components/UploadForm';
 import Background3D from '../components/Background3D';
+import DroneToolsModal from '../components/DroneToolsModal';
 
 const Dashboard = () => {
+
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isToolsOpen, setIsToolsOpen] = useState(false);
 
     const fetchProjects = async () => {
         try {
@@ -53,8 +57,10 @@ const Dashboard = () => {
                 </header>
 
                 <div className="glass-card mb-12" style={{ background: 'rgba(255, 255, 255, 0.03)', backdropFilter: 'blur(5px)', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                    <UploadForm onUploadSuccess={fetchProjects} />
+                    <UploadForm onUploadSuccess={fetchProjects} onOpenTools={() => setIsToolsOpen(true)} />
                 </div>
+
+                <DroneToolsModal isOpen={isToolsOpen} onClose={() => setIsToolsOpen(false)} />
 
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-light text-white tracking-wide">Recent Projects</h2>

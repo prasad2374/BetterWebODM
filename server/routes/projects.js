@@ -103,6 +103,7 @@ router.post('/', upload.array('images'), async (req, res) => {
 router.get('/', async (req, res) => {
     try {
         let projects = await Project.find().sort({ createdAt: -1 });
+        console.log(`[DEBUG] GET /projects found ${projects.length} docs`);
 
         // Sync Status for all PROCESSING projects
         await Promise.all(projects.map(async (project) => {
@@ -245,6 +246,7 @@ router.get('/:id/tiles/:z/:x/:y.png', async (req, res) => {
                 responseType: 'stream',
                 headers: headers
             });
+            // console.log(`[DEBUG] Serving Tile: ${z}/${x}/${y}`); // Uncomment for verbose tile logging
             response.data.pipe(res);
         } catch (axiosError) {
             if (axiosError.response && axiosError.response.status === 404) {
@@ -291,6 +293,64 @@ router.get('/:id/model', async (req, res) => {
     } catch (error) {
         console.error('Server Error:', error);
         res.status(500).send('Server Error');
+    }
+});
+
+const { spawn } = require('child_process');
+
+// POST /api/projects/:id/detect - Run Object Detection
+router.post('/:id/detect', async (req, res) => {
+    try {
+        const project = await Project.findById(req.params.id);
+        if (!project) return res.status(404).json({ error: 'Project not found' });
+
+        console.log(`[DEBUG] Starting Raw Detection for ${project.name} on ${project.images.length} images`);
+
+        // execute detect_task.py (Strategy A - Stitched Orthophoto)
+        // Detects on the map file directly.
+        const pythonProcess = spawn('python', [
+            'detect_task.py',
+            '--task_id', project.odmTaskId,
+            '--project_id', project.odmProjectId,
+            '--model', '../best.pt'
+        ], {
+            cwd: path.resolve(__dirname, '..') // Run in 'server' folder
+        });
+
+        let stdoutData = '';
+        let stderrData = '';
+
+        pythonProcess.stdout.on('data', (data) => {
+            stdoutData += data.toString();
+        });
+
+        pythonProcess.stderr.on('data', (data) => {
+            stderrData += data.toString();
+            console.error('[PYTHON ERR]', data.toString());
+        });
+
+        pythonProcess.on('close', (code) => {
+            if (code !== 0) {
+                console.error('[DETECT FAIL]', stderrData);
+                return res.status(500).json({ error: 'Detection failed', details: stderrData });
+            }
+            try {
+                // Find JSON start/end if there's noise
+                const jsonStr = stdoutData.trim();
+                // Simple cleanup if mixed output
+                const lastLine = jsonStr.split('\n').pop();
+                const jsonResult = JSON.parse(lastLine);
+                res.json(jsonResult);
+            } catch (e) {
+                console.error('JSON Parse Error:', e);
+                console.log('Raw Output:', stdoutData);
+                res.status(500).json({ error: 'Invalid output from detection script', raw: stdoutData });
+            }
+        });
+
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: e.message });
     }
 });
 

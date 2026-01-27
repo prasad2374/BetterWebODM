@@ -1,0 +1,6 @@
+ultralytics
+opencv-python-headless
+rasterio
+numpy
+requests
+python-dotenv

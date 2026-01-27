@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { uploadProject } from '../services/api';
 
-const UploadForm = ({ onUploadSuccess }) => {
+const UploadForm = ({ onUploadSuccess, onOpenTools }) => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [files, setFiles] = useState([]);
@@ -88,7 +88,16 @@ const UploadForm = ({ onUploadSuccess }) => {
                     </div>
                 </div>
 
-                <div className="pt-4 flex justify-end">
+                <div className="pt-4 flex justify-between items-center">
+                    <button
+                        type="button"
+                        onClick={onOpenTools}
+                        className="glass-button py-3 px-6 text-sm tracking-widest uppercase font-medium flex items-center space-x-2 text-gray-300 hover:text-white"
+                    >
+
+                        <span>Drone Tools</span>
+                    </button>
+
                     <button
                         type="submit"
                         disabled={upgrading}

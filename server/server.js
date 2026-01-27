@@ -10,7 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 console.log('--- Startup Config Check ---');
-console.log('MONGO_URI:', process.env.MONGO_URI ? 'Set' : 'MISSING');
+console.log('MONGO_URI:', process.env.MONGO_URI);
 console.log('WEBODM_URL:', process.env.WEBODM_URL);
 console.log('WEBODM_USER:', process.env.WEBODM_USER ? process.env.WEBODM_USER : 'MISSING');
 console.log('WEBODM_PASS:', process.env.WEBODM_PASS ? '****' : 'MISSING');
@@ -23,11 +23,12 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Database Connection
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/webodm-custom')
-    .then(() => console.log('MongoDB Connected'))
+    .then((conn) => console.log('MongoDB Connected to:', conn.connection.name))
     .catch(err => console.error('MongoDB Connection Error:', err));
 
 // Routes
 app.use('/api/projects', require('./routes/projects'));
+app.use('/api/tools', require('./routes/tools'));
 
 app.get('/', (req, res) => {
     res.send('WebODM Custom Backend Running');
