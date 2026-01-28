@@ -15,7 +15,8 @@ env_path = os.path.join(os.path.dirname(__file__), '.env')
 load_dotenv(env_path)
 
 isDev = sys.argv.count("--dev") > 0
-sys.argv.remove("--dev")
+if isDev:
+    sys.argv.remove("--dev")
 WEBODM_URL = f"http://{"localhost" if isDev  else  os.getenv('WEBODM_ADDR', 'localhost')}:{os.getenv('WEBODM_PORT', '8000')}"
 USERNAME = os.getenv('WEBODM_USER', 'admin')  # Changed from WEBODM_USERNAME
 PASSWORD = os.getenv('WEBODM_PASS', 'admin')  # Changed from WEBODM_PASSWORD
