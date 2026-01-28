@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 		cb(null, uploadDir);
 	},
 	filename: (req, file, cb) => {
-		cb(null, Date.now() + "-" + file.originalname);
+		cb(null, Date.now() + "-" + Math.round(Math.random() * 1e9) + "-" + file.originalname);
 	},
 });
 const upload = multer({ storage: storage });
@@ -312,7 +312,7 @@ router.post("/:id/detect", async (req, res) => {
 		// execute detect_task.py (Strategy A - Stitched Orthophoto)
 		// Detects on the map file directly.
 		// console.log("TEST", project)
-		
+
 		const pythonProcess = spawn(
 			"python",
 			[
