@@ -5,6 +5,7 @@ import multer from "multer";
 import path from "path";
 import Project from "../models/Project";
 import webodmService from "../services/webodmService";
+import crypto from "crypto"
 const router = express.Router();
 const WEBODM_ADDR = process.argv.includes("--dev") ? "localhost" : process.env.WEBODM_ADDR;
 function logDebug(msg) {
@@ -21,7 +22,9 @@ const storage = multer.diskStorage({
 		cb(null, uploadDir);
 	},
 	filename: (req, file, cb) => {
-		cb(null, Date.now() + "-" + Math.round(Math.random() * 1e9) + "-" + file.originalname);
+		// FIX: Add Randomness to prevent overwrite collisions in the same millisecond
+		const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9) + crypto.randomUUID();
+		cb(null, uniqueSuffix + "-" + file.originalname);
 	},
 });
 const upload = multer({ storage: storage });
@@ -300,6 +303,7 @@ router.get("/:id/model", async (req, res) => {
 });
 
 import { spawn } from "child_process";
+import {randomUUID} from "crypto";
 
 // POST /api/projects/:id/detect - Run Object Detection
 router.post("/:id/detect", async (req, res) => {
