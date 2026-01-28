@@ -15,7 +15,7 @@ env_path = os.path.join(os.path.dirname(__file__), '.env')
 load_dotenv(env_path)
 
 isDev = sys.argv.count("--dev") > 0
-print(f"http://{"localhost" if isDev  else  os.getenv('WEBODM_ADDR', 'localhost')}:{os.getenv('WEBODM_PORT', '8000')}", isDev)
+sys.argv.remove("--dev")
 WEBODM_URL = f"http://{"localhost" if isDev  else  os.getenv('WEBODM_ADDR', 'localhost')}:{os.getenv('WEBODM_PORT', '8000')}"
 USERNAME = os.getenv('WEBODM_USER', 'admin')  # Changed from WEBODM_USERNAME
 PASSWORD = os.getenv('WEBODM_PASS', 'admin')  # Changed from WEBODM_PASSWORD
@@ -135,7 +135,8 @@ def apply_hybrid_filter(candidates, iou_thresh=0.5):
 
     return [candidates[i] for i in range(n) if keep[i]]
 
-def run_inference(tif_path, model_path, tile_size=1280, overlap=0.2):
+def run_inference(tif_path, model_path, tile_size=1280, overlap=0):
+    print("MODEL PATH", model_path)
     model = YOLO(model_path)
     global_candidates = [] # Store all detections here before NMS
 
@@ -279,7 +280,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--task_id', required=True)
     parser.add_argument('--project_id', required=True)
-    parser.add_argument('--model', default='../best.pt')
+    parser.add_argument('--model', default='')
+    # parser.add_argument('--model', default='PyTorch')
     args = parser.parse_args()
 
     # Setup paths
@@ -293,12 +295,13 @@ if __name__ == "__main__":
         # Determine Download URL (Use /download/ format verified earlier)
         url = f"{WEBODM_URL}/api/projects/{args.project_id}/tasks/{args.task_id}/download/orthophoto.tif"
         print(f"Downloading from: {url}", file=sys.stderr)
+        # print(f"TEST", args)
 
         download_file(url, temp_tif, headers)
         print(f"Download complete. File size: {os.path.getsize(temp_tif)} bytes", file=sys.stderr)
 
         print(f"Running Inference on {temp_tif} with model {args.model}...", file=sys.stderr)
-        geojson = run_inference(temp_tif, args.model)
+        geojson = run_inference(temp_tif, f"yolomodels/{args.model}")
 
         print("Inference complete. Dumping JSON...", file=sys.stderr)
         print(json.dumps(geojson))

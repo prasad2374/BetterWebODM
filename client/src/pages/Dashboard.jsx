@@ -39,7 +39,7 @@ const Dashboard = () => {
 			<div className="container mx-auto px-4 py-8 relative z-10">
 				<header className="mb-12 flex justify-between items-end">
 					<div>
-						<h1 className="text-6xl font-bold tracking-tighter mb-2 text-gradient">ZIIP</h1>
+						<h1 className="text-6xl font-bold tracking-tighter mb-2 text-gradient letter-spacing-1">ZIIP</h1>
 						<p className="text-gray-400 font-bold tracking-widest text-sm uppercase pl-1">
 							Zero Infinity Intelligence Platform
 						</p>

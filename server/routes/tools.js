@@ -6,7 +6,7 @@ import fs from "fs-extra";
 import multer from "multer";
 
 // Configure Multer for temp storage
-const tempDir = path.join(__dirname, "..", "temp_tools");
+const tempDir = path.join(process.cwd(), "temp_tools");
 if (!fs.existsSync(tempDir)) {
 	fs.mkdirSync(tempDir);
 }
@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-const TOOLS_DIR = path.join(__dirname, "..", "tools");
+const TOOLS_DIR = path.join(process.cwd(), "tools");
 // We assume best.pt is in the root of the server or project.
 // Based on previous file exploration, it was in CustomApp/best.pt
 // or CustomApp/server/best.pt?
@@ -35,7 +35,7 @@ const TOOLS_DIR = path.join(__dirname, "..", "tools");
 // Wait, __dirname is CustomApp/server/routes
 // .. is CustomApp/server
 // ../.. is CustomApp/
-const MODEL_PATH = path.resolve(__dirname, "yolomodels/yolo11l_Best.pt");
+const MODEL_PATH = path.resolve(process.cwd(), "yolomodels/yolo11l_Best.pt");
 
 // Helper to run python script
 const runPython = (scriptName, args, res) => {
@@ -67,19 +67,22 @@ const runPython = (scriptName, args, res) => {
 // GET /api/tools/models
 router.get("/models", (req, res) => {
 	try {
-		// Models are in d:\WebODM\odm_data_bellus-master\odm_data_bellus-master\models\yolo11 models
-		// Relative to CustomApp/server/routes (where this file is potentially running, wait tools.js is in routes?)
-		// Yes, tools.js is in CustomApp/server/routes.
-		// So ../../../models/yolo11 models
-		const modelsPath = path.fs.resolve(__dirname, "yolomodels");
+
+		console.log("Path", path.resolve(process.cwd(), "yolomodels"));
+		const modelsPath = path.resolve(process.cwd(), "yolomodels");
 		if (!fs.existsSync(modelsPath)) {
 			return res.json([]);
 		}
 		const files = fs
 			.readdirSync(modelsPath)
-			.filter((f) => f.endsWith(".pt"))
-			.map((f) => f.replaceAll(".pt", "").replace("_Best", "\t(Best)"));
-		res.json(files);
+			.filter((f) => f.endsWith(".pt"));
+		const formattedFiles = files.map((f) => f.replaceAll(".pt", "").replace("_Best", "\t(Best)"));
+		const models = {}
+		for(let i = 0; i < files.length; i++) {
+			models[files[i]] = formattedFiles[i]
+		}
+		// console.log(models)
+		res.json(models);
 	} catch (e) {
 		console.error("Error listing models:", e);
 		res.status(500).json({ error: "Failed to list models" });
@@ -102,7 +105,7 @@ router.post("/est-focal", upload.array("images"), (req, res) => {
 	const modelName = req.body.model;
 	let modelArg = MODEL_PATH;
 	if (modelName) {
-		modelArg = path.fs.resolve(__dirname, "yolomodels", modelName);
+		modelArg = path.fs.resolve(process.cwd(), "yolomodels", modelName);
 	}
 
 	// We need to pass a directory.
@@ -160,7 +163,7 @@ router.post("/analyze", upload.array("images"), (req, res) => {
 	const modelName = req.body.model;
 	let modelArg = MODEL_PATH;
 	if (modelName) {
-		modelArg = path.fs.resolve(__dirname, "yolomodels", modelName);
+		modelArg = path.fs.resolve(process.cwd(), "yolomodels", modelName);
 	}
 
 	const batchId = Date.now().toString();

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 
 const DroneToolsModal = ({ isOpen, onClose }) => {
 	const [activeTab, setActiveTab] = useState("height");
@@ -17,12 +17,12 @@ const DroneToolsModal = ({ isOpen, onClose }) => {
 	const [models, setModels] = useState([]);
 	const [selectedModel, setSelectedModel] = useState("");
 
-	const WEBODM_ADDR = __USE_DEV_ADDR__ ? "localhost" : import.meta.env.VITE_WEBODM_ADDR;
+	const WEBODM_ADDR = __USE_DEV_ADDR__ ? "localhost" : import.meta.env.VITE_SERVER_ADDR;
 	React.useEffect(() => {
 		if (!isOpen) return;
 		const fetchModels = async () => {
 			try {
-				const res = await fetch(`http://${WEBODM_ADDR}:${process.env.VITE_PORT}/tools/models`);
+				const res = await fetch(`http://${WEBODM_ADDR}:${import.meta.env.VITE_PORT}/api/tools/models`);
 				if (res.ok) {
 					const data = await res.json();
 					setModels(data);
@@ -40,7 +40,7 @@ const DroneToolsModal = ({ isOpen, onClose }) => {
 		e.preventDefault();
 		setHeightLoading(true);
 		try {
-			const baseUrl = `http://${WEBODM_ADDR}:${process.env.VITE_PORT}/api`;
+			const baseUrl = `http://${WEBODM_ADDR}:${import.meta.env.VITE_PORT}/api`;
 			const res = await fetch(`${baseUrl}/tools/calc-height`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -72,7 +72,7 @@ const DroneToolsModal = ({ isOpen, onClose }) => {
 		setLoading(true);
 		setResult(null); // Reset previous result
 		try {
-			const baseUrl = `http://${WEBODM_ADDR}:${process.env.VITE_PORT}/api`;
+			const baseUrl = `http://${WEBODM_ADDR}:${import.meta.env.VITE_PORT}/api`;
 			const res = await fetch(`${baseUrl}/tools/${endpoint}`, {
 				method: "POST",
 				body: formData,

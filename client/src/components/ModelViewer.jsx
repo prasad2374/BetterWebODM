@@ -9,8 +9,8 @@ const Model = ({ url }) => {
 
 const ModelViewer = ({ taskId }) => {
 	// Backend proxy URL for the model
-	const WEBODM_ADDR = __USE_DEV_ADDR__ ? "localhost" : import.meta.env.VITE_WEBODM_ADDR;
-	const modelUrl = `http://${WEBODM_ADDR}:${process.env.VITE_PORT}/api/projects/${taskId}/model`;
+	const WEBODM_ADDR = __USE_DEV_ADDR__ ? "localhost" : import.meta.env.VITE_SERVER_ADDR;
+	const modelUrl = `http://${WEBODM_ADDR}:${import.meta.env.VITE_PORT}/api/projects/${taskId}/model`;
 	return (
 		<div className="h-full w-full bg-gray-900 rounded-lg overflow-hidden shadow-inner border border-gray-700 relative">
 			<Canvas

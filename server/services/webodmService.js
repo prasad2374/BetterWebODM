@@ -16,7 +16,8 @@ const getHeaders = async () => {
 
 const login = async () => {
 	try {
-		const response = await axios.post(`http://${WEBODM_ADDR}:${process.env.WEBODM_PORT}/api/token-auth/`, {
+		// console.log(process.env.WEBODM_PORT);
+		const response = await axios.post(`http://${WEBODM_ADDR}:${process.env.WEBODM_PORT || 8000}/api/token-auth/`, {
 			username: process.env.WEBODM_USER,
 			password: process.env.WEBODM_PASS,
 		});
@@ -32,7 +33,7 @@ const createProject = async (name, description) => {
 	const headers = await getHeaders();
 	try {
 		const response = await axios.post(
-			`http://${WEBODM_ADDR}:${process.env.WEBODM_PORT}/api/projects/`,
+			`http://${WEBODM_ADDR}:${process.env.WEBODM_PORT || 8000}/api/projects/`,
 			{
 				name,
 				description,
@@ -65,7 +66,7 @@ const createTask = async (projectId, imagePaths) => {
 
 	try {
 		const response = await axios.post(
-			`http://${WEBODM_ADDR}:${process.env.WEBODM_PORT}/api/projects/${projectId}/tasks/`,
+			`http://${WEBODM_ADDR}:${process.env.WEBODM_PORT || 8000}/api/projects/${projectId}/tasks/`,
 			form,
 			{
 				headers: {
@@ -87,7 +88,7 @@ const getTaskStatus = async (taskId, projectId) => {
 	const headers = await getHeaders();
 	try {
 		const response = await axios.get(
-			`http://${WEBODM_ADDR}:${process.env.WEBODM_PORT}/api/projects/${projectId}/tasks/${taskId}/`,
+			`http://${WEBODM_ADDR}:${process.env.WEBODM_PORT || 8000}/api/projects/${projectId}/tasks/${taskId}/`,
 			{
 				headers,
 			},
@@ -105,7 +106,7 @@ const getTaskAssets = async (taskId, projectId) => {
 	try {
 		// This is generic, actual asset download needs specific endpoints
 		const response = await axios.get(
-			`http://${WEBODM_ADDR}:${process.env.WEBODM_PORT}/api/projects/${projectId}/tasks/${taskId}/`,
+			`http://${WEBODM_ADDR}:${process.env.WEBODM_PORT || 8000}/api/projects/${projectId}/tasks/${taskId}/`,
 			{
 				headers,
 			},

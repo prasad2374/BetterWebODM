@@ -1,7 +1,7 @@
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import React from "react";
-import { GeoJSON, MapContainer, TileLayer, useMap } from "react-leaflet";
+import {GeoJSON, MapContainer, TileLayer, useMap} from "react-leaflet";
 
 // Fix for default marker icon in React Leaflet
 import icon from "leaflet/dist/images/marker-icon.png";
@@ -19,19 +19,20 @@ L.Marker.prototype.options.icon = DefaultIcon;
 const MapViewer = ({ taskId, project, detections }) => {
 	// Use local backend proxy to fetch tiles authenticated
 
-	const WEBODM_ADDR = __USE_DEV_ADDR__ ? "localhost" : import.meta.env.VITE_WEBODM_ADDR;
-	const baseUrl = `http://${WEBODM_ADDR}:${process.env.VITE_PORT}/api`;
+	const WEBODM_ADDR = __USE_DEV_ADDR__ ? "localhost" : import.meta.env.VITE_SERVER_ADDR;
+	const baseUrl = `http://${WEBODM_ADDR}:${import.meta.env.VITE_PORT}/api`;
 	const tileUrl = `${baseUrl}/projects/${taskId}/tiles/{z}/{x}/{y}.png`;
 
 	return (
 		<div className="h-full w-full rounded-lg overflow-hidden shadow-inner border border-gray-300 group">
 			<MapContainer
-				center={[0, 0]}
-				zoom={2}
+				center={project.center}
+				zoom={project.zoom}
 				style={{ height: "100%", width: "100%" }}>
 				<MapContent
 					project={project}
 					detections={detections}
+					// orthoPhotoUrl={orthoPhotoUrl}
 					tileUrl={tileUrl}
 				/>
 			</MapContainer>
@@ -39,7 +40,7 @@ const MapViewer = ({ taskId, project, detections }) => {
 	);
 };
 
-const MapContent = ({ project, detections, tileUrl }) => {
+const MapContent = ({ project, detections, tileUrl, orthoPhotoUrl }) => {
 	const map = useMap();
 	const [bounds, setBounds] = React.useState(null);
 	const [mousePos, setMousePos] = React.useState(null);
@@ -47,7 +48,6 @@ const MapContent = ({ project, detections, tileUrl }) => {
 
 	const [sliderValue, setSliderValue] = React.useState(50);
 	const boxRef = React.useRef(null);
-
 	// --- Grid Layer ---
 	React.useEffect(() => {
 		if (!map) return;
@@ -80,7 +80,6 @@ const MapContent = ({ project, detections, tileUrl }) => {
 		});
 		const grid = new CanvasGrid({ zIndex: 1000, pointerEvents: "none" });
 		map.addLayer(grid);
-
 		// --- Mouse Move for Cursor Pos ---
 		const onMouseMove = (e) => {
 			setMousePos(e.latlng);
@@ -113,6 +112,9 @@ const MapContent = ({ project, detections, tileUrl }) => {
 			}
 		}
 	}, [project, map, initialFitDone]);
+	React.useEffect(() => {
+		console.log("BOUNDS", bounds);
+	}, [bounds]);
 
 	return (
 		<>
@@ -155,6 +157,7 @@ const MapContent = ({ project, detections, tileUrl }) => {
 					minZoom={15}
 				/>
 			)}
+
 
 			{/* Cursor Position Display */}
 			{mousePos && (

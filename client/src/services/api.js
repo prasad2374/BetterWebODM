@@ -1,10 +1,10 @@
 import axios from "axios";
-const WEBODM_ADDR = __USE_DEV_ADDR__ ? "localhost" : import.meta.env.VITE_WEBODM_ADDR;
+const SERVER_ADDR = __USE_DEV_ADDR__ ? "localhost" : import.meta.env.VITE_SERVER_ADDR;
 const API = axios.create({
-	baseURL: `http://${WEBODM_ADDR}:${import.meta.env.VITE_PORT}/api`,
+	baseURL: `http://${SERVER_ADDR}:${import.meta.env.VITE_PORT || 8001}/api`,
 });
-console.log(WEBODM_ADDR)
-console.log(API.getUri())
+// console.log(SERVER_ADDR)
+// console.log(API.getUri())
 
 export const getProjects = () => API.get("/projects");
 export const getProject = (id) => API.get(`/projects/${id}`);
