@@ -282,7 +282,6 @@ if __name__ == "__main__":
     parser.add_argument('--task_id', required=True)
     parser.add_argument('--project_id', required=True)
     parser.add_argument('--model', default='')
-    # parser.add_argument('--model', default='PyTorch')
     args = parser.parse_args()
 
     # Setup paths

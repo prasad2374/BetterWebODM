@@ -311,7 +311,17 @@ router.post("/:id/detect", async (req, res) => {
 
 		// execute detect_task.py (Strategy A - Stitched Orthophoto)
 		// Detects on the map file directly.
-		// console.log("TEST", req.body.model)
+		// console.log("TEST", project)
+		console.log("TEST", [
+			"detect_task.py",
+			"--task_id",
+			project.odmTaskId,
+			"--project_id",
+			project.odmProjectId,
+			"--model",
+			req.body.model ?? path.resolve(process.cwd(), "yolomodels/yolo11l_Best.pt"),
+			process.argv.includes("--dev") ? "--dev" : "",
+		]);
 		const pythonProcess = spawn(
 			"python",
 			["detect_task.py", "--task_id", project.odmTaskId, "--project_id", project.odmProjectId, "--model", req.body.model ?? path.resolve(process.cwd(), "yolomodels/yolo11l_Best.pt"), process.argv.includes("--dev") ? "--dev" : ""],
