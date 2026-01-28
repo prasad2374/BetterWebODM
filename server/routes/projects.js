@@ -7,7 +7,7 @@ import Project from "../models/Project";
 import webodmService from "../services/webodmService";
 const router = express.Router();
 const WEBODM_ADDR = process.argv.includes("--dev") ? "localhost" : process.env.WEBODM_ADDR;
-function logDebug (msg) {
+function logDebug(msg) {
 	console.log(`[DEBUG] ${msg}`);
 }
 
@@ -24,20 +24,20 @@ const storage = multer.diskStorage({
 		cb(null, Date.now() + "-" + file.originalname);
 	},
 });
-const upload = multer({storage: storage});
+const upload = multer({ storage: storage });
 
 // POST /api/projects - Create Project & Upload Images
 router.post("/", upload.array("images"), async (req, res) => {
 	console.log("[DEBUG] Received POST /api/projects");
 	try {
-		const {name, description} = req.body;
+		const { name, description } = req.body;
 		const files = req.files;
 
 		console.log(`[DEBUG] Name: ${name}, Files: ${files ? files.length : 0}`);
 
 		if (!files || files.length === 0) {
 			console.error("[DEBUG] No files uploaded");
-			return res.status(400).json({error: "No images uploaded"});
+			return res.status(400).json({ error: "No images uploaded" });
 		}
 
 		// 1. Create Project in Local DB
@@ -88,18 +88,18 @@ router.post("/", upload.array("images"), async (req, res) => {
 			await newProject.save();
 
 			// Return Error to UI
-			return res.status(500).json({error: errMsg});
+			return res.status(500).json({ error: errMsg });
 		}
 	} catch (error) {
 		console.error("[DEBUG] Server Route Error:", error);
-		res.status(500).json({error: "Server Error"});
+		res.status(500).json({ error: "Server Error" });
 	}
 });
 
 // GET /api/projects - List All
 router.get("/", async (req, res) => {
 	try {
-		let projects = await Project.find().sort({createdAt: -1});
+		let projects = await Project.find().sort({ createdAt: -1 });
 		console.log(`[DEBUG] GET /projects found ${projects.length} docs`);
 
 		// Sync Status for all PROCESSING projects
@@ -164,7 +164,7 @@ router.get("/", async (req, res) => {
 		res.json(projects);
 	} catch (error) {
 		console.error("[ERROR] GET /projects failed:", error);
-		res.status(500).json({error: "Server Error: " + error.message});
+		res.status(500).json({ error: "Server Error: " + error.message });
 	}
 });
 
@@ -172,7 +172,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
 	try {
 		const project = await Project.findById(req.params.id);
-		if (!project) return res.status(404).json({error: "Project not found"});
+		if (!project) return res.status(404).json({ error: "Project not found" });
 
 		// Sync Status if Processing
 		if (project.odmTaskId && project.status === "PROCESSING") {
@@ -224,14 +224,14 @@ router.get("/:id", async (req, res) => {
 
 		res.json(project);
 	} catch (error) {
-		res.status(500).json({error: "Server Error"});
+		res.status(500).json({ error: "Server Error" });
 	}
 });
 
 // GET /api/projects/:id/tiles/:z/:x/:y.png - Proxy Tile Request
 router.get("/:id/tiles/:z/:x/:y.png", async (req, res) => {
 	try {
-		const {id, z, x, y} = req.params;
+		const { id, z, x, y } = req.params;
 		const project = await Project.findById(id);
 
 		if (!project || !project.odmTaskId || !project.odmProjectId) {
@@ -267,7 +267,7 @@ router.get("/:id/tiles/:z/:x/:y.png", async (req, res) => {
 // GET /api/projects/:id/model - Proxy 3D Model (GLB)
 router.get("/:id/model", async (req, res) => {
 	try {
-		const {id} = req.params;
+		const { id } = req.params;
 		const project = await Project.findById(id);
 
 		if (!project || !project.odmTaskId || !project.odmProjectId) {
@@ -299,32 +299,32 @@ router.get("/:id/model", async (req, res) => {
 	}
 });
 
-import {spawn} from "child_process";
+import { spawn } from "child_process";
 
 // POST /api/projects/:id/detect - Run Object Detection
 router.post("/:id/detect", async (req, res) => {
 	try {
 		const project = await Project.findById(req.params.id);
-		if (!project) return res.status(404).json({error: "Project not found"});
+		if (!project) return res.status(404).json({ error: "Project not found" });
 
 		console.log(`[DEBUG] Starting Raw Detection for ${project.name} on ${project.images.length} images`);
 
 		// execute detect_task.py (Strategy A - Stitched Orthophoto)
 		// Detects on the map file directly.
 		// console.log("TEST", project)
-		console.log("TEST", [
-			"detect_task.py",
-			"--task_id",
-			project.odmTaskId,
-			"--project_id",
-			project.odmProjectId,
-			"--model",
-			req.body.model ?? path.resolve(process.cwd(), "yolomodels/yolo11l_Best.pt"),
-			process.argv.includes("--dev") ? "--dev" : "",
-		]);
+		
 		const pythonProcess = spawn(
 			"python",
-			["detect_task.py", "--task_id", project.odmTaskId, "--project_id", project.odmProjectId, "--model", req.body.model ?? path.resolve(process.cwd(), "yolomodels/yolo11l_Best.pt"), process.argv.includes("--dev") ? "--dev" : ""],
+			[
+				"detect_task.py",
+				"--task_id",
+				project.odmTaskId,
+				"--project_id",
+				project.odmProjectId,
+				"--model",
+				req.body.model ?? path.resolve(process.cwd(), "yolomodels/yolo11l_Best.pt"),
+				process.argv.includes("--dev") ? "--dev" : "",
+			].filter((arg) => arg !== ""),
 			{
 				cwd: process.cwd(), // Run in 'server' folder
 			},
@@ -345,7 +345,7 @@ router.post("/:id/detect", async (req, res) => {
 		pythonProcess.on("close", (code) => {
 			if (code !== 0) {
 				console.error("[DETECT FAIL]", stderrData);
-				return res.status(500).json({error: "Detection failed", details: stderrData});
+				return res.status(500).json({ error: "Detection failed", details: stderrData });
 			}
 			try {
 				// Find JSON start/end if there's noise
@@ -357,12 +357,12 @@ router.post("/:id/detect", async (req, res) => {
 			} catch (e) {
 				console.error("JSON Parse Error:", e);
 				console.log("Raw Output:", stdoutData);
-				res.status(500).json({error: "Invalid output from detection script", raw: stdoutData});
+				res.status(500).json({ error: "Invalid output from detection script", raw: stdoutData });
 			}
 		});
 	} catch (e) {
 		console.error(e);
-		res.status(500).json({error: e.message});
+		res.status(500).json({ error: e.message });
 	}
 });
 
