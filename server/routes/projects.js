@@ -35,7 +35,7 @@ router.post("/", upload.array("images"), async (req, res) => {
 	try {
 		const { name, description } = req.body;
 		const files = req.files;
-
+		console.log("TESTTT")
 		console.log(`[DEBUG] Name: ${name}, Files: ${files ? files.length : 0}`);
 
 		if (!files || files.length === 0) {

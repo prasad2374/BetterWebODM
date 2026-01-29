@@ -38,7 +38,7 @@ const createProject = async (name, description) => {
 				name,
 				description,
 			},
-			{ headers },
+			{headers},
 		);
 		return response.data;
 	} catch (error) {
@@ -53,14 +53,13 @@ const createTask = async (projectId, imagePaths) => {
 
 	// WebODM NodeODM API options (can be customized)
 	const options = [
-		{ name: "dsm", value: true },
-		{ name: "dtm", value: true },
-		{ name: "orthophoto-resolution", value: 5 }, // 5 cm/px
-		{ name: "mesh-size", value: "default" }, // Ensure 3D mesh is generated
-		{ name: "force-gps", value: false },
+		{name: "dsm", value: true},
+		{name: "dtm", value: true},
+		{name: "orthophoto-resolution", value: 5}, // 5 cm/px
+		{name: "mesh-size", value: 10000}, 
 	];
 	form.append("options", JSON.stringify(options));
-	form.append("processing_node", 1);
+	form.append("processing_node", "1");
 
 	// Append Images
 	imagePaths.forEach((imagePath) => {
