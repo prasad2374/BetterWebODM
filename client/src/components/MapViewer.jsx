@@ -1,7 +1,7 @@
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import React from "react";
-import {GeoJSON, MapContainer, TileLayer, useMap} from "react-leaflet";
+import { GeoJSON, MapContainer, TileLayer, useMap } from "react-leaflet";
 
 // Fix for default marker icon in React Leaflet
 import icon from "leaflet/dist/images/marker-icon.png";
@@ -138,8 +138,29 @@ const MapContent = ({ project, detections, tileUrl, orthoPhotoUrl }) => {
 					})}
 					onEachFeature={(feature, layer) => {
 						const p = feature.properties;
-						if (p && p.label) {
-							layer.bindPopup(p.label); // simplified for brevity in this view
+						if (p) {
+							const content = `
+								<div class="min-w-[200px] font-sans">
+									<div class="bg-gray-900 text-white p-2 rounded-t-lg -mx-4 -mt-3 mb-2 flex justify-between items-center">
+										<span class="font-bold uppercase tracking-wider text-xs">${p.label || "Object"}</span>
+										<span class="text-xs bg-green-500/20 text-green-300 px-2 py-0.5 rounded">${p.confidence ? (p.confidence * 100).toFixed(1) + "%" : "N/A"}</span>
+									</div>
+									${p.image
+									? `<div class="mb-2 rounded overflow-hidden border border-gray-200">
+												<img src="data:image/jpeg;base64,${p.image}" class="w-full h-auto object-cover" alt="${p.label}" />
+											   </div>`
+									: ""
+								}
+									<div class="text-xs text-gray-500 grid grid-cols-2 gap-1">
+										<span>Lat:</span> <span class="text-gray-700 font-mono text-right">${p.centroid ? p.centroid[0].toFixed(6) : "-"}</span>
+										<span>Lon:</span> <span class="text-gray-700 font-mono text-right">${p.centroid ? p.centroid[1].toFixed(6) : "-"}</span>
+									</div>
+								</div>
+							`;
+							layer.bindPopup(content, {
+								maxWidth: 300,
+								className: "custom-popup" // We can add global styles if needed, or rely on Tailwind classes if configured
+							});
 						}
 					}}
 				/>

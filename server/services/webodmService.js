@@ -56,6 +56,8 @@ const createTask = async (projectId, imagePaths) => {
 		{ name: "dsm", value: true },
 		{ name: "dtm", value: true },
 		{ name: "orthophoto-resolution", value: 5 }, // 5 cm/px
+		{ name: "mesh-size", value: "default" }, // Ensure 3D mesh is generated
+		{ name: "force-gps", value: false },
 	];
 	form.append("options", JSON.stringify(options));
 	form.append("processing_node", 1);

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 
 const DroneToolsModal = ({ isOpen, onClose }) => {
 	const [activeTab, setActiveTab] = useState("height");
@@ -110,9 +110,9 @@ const DroneToolsModal = ({ isOpen, onClose }) => {
                             ${activeTab === tab ? "bg-white/10 text-white border-b-2 border-blue-500" : "text-gray-500 hover:text-gray-300 hover:bg-white/5"}`}>
 							{tab === "height" ?
 								"Flight Height"
-							: tab === "focal" ?
-								"Focal Estimator"
-							:	"Drone Analysis"}
+								: tab === "focal" ?
+									"Focal Estimator"
+									: "Drone Analysis"}
 						</button>
 					))}
 				</div>
@@ -258,6 +258,21 @@ const DroneToolsModal = ({ isOpen, onClose }) => {
 								evaluate model performance (detections, confidence) and determine the best flight configuration.
 							</div>
 							<form onSubmit={(e) => handleFileUpload(e, "analyze", setAnalysisLoading, setAnalysisResult)}>
+								<div className="mb-4">
+									<label className="block text-xs uppercase text-gray-400 mb-2">Select Detection Model</label>
+									<select
+										value={selectedModel}
+										onChange={(e) => setSelectedModel(e.target.value)}
+										className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
+										<option value="" disabled>-- Choose a Model --</option>
+										{Object.entries(models).map(([filename, label]) => (
+											<option key={filename} value={filename}>
+												{label}
+											</option>
+										))}
+									</select>
+								</div>
+
 								<label className="block w-full cursor-pointer group">
 									<div className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-white/20 rounded-xl group-hover:border-white/40 group-hover:bg-white/5 transition-all">
 										<div className="flex flex-col items-center justify-center pt-5 pb-6">
