@@ -73,9 +73,10 @@ const createTask = async (projectId, imagePaths) => {
 					...headers,
 					...form.getHeaders(),
 				},
+				processing_node: "node-odm-1",
 				maxBodyLength: Infinity,
 				maxContentLength: Infinity,
-				auto_processing_node: true,
+				// auto_processing_node: true,
 			},
 		);
 		return response.data;
