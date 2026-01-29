@@ -75,6 +75,7 @@ const createTask = async (projectId, imagePaths) => {
 				},
 				maxBodyLength: Infinity,
 				maxContentLength: Infinity,
+				auto_processing_node: true,
 			},
 		);
 		return response.data;
