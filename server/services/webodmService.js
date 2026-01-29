@@ -58,7 +58,7 @@ const createTask = async (projectId, imagePaths) => {
 		{ name: "orthophoto-resolution", value: 5 }, // 5 cm/px
 	];
 	form.append("options", JSON.stringify(options));
-	form.append("processing_node", "node-odm-1");
+	form.append("processing_node", 1);
 
 	// Append Images
 	imagePaths.forEach((imagePath) => {
